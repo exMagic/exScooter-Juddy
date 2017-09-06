@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "RTClib.h"
 RTC_DS1307 RTC;
-
+//test
 int as = 0; //jak szybko wykonuje sie pętla
 int initial = 0;
 int final = 0;

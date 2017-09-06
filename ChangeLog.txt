@@ -1,4 +1,10 @@
-exScooter ChangeLog
+////////////////////////////////////////////////////
+//////                                       ///////
+//////          exScooter ChangeLog          ///////
+//////                                       ///////
+////////////////////////////////////////////////////
+
+https://github.com/exMagic/exScooter
 
 06.09.2017 v0.1
  *initial commit witch code developed til 30.07.2016

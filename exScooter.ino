@@ -7,6 +7,8 @@ int initial = 0;
 int final = 0;
 
 #include "U8glib.h"
+// SW SPI Com: SCK/CLK/D0 = 13, MOSI/DIN/D1 = 11, CS/CS = 10, A0/D/C/DC = 9
+
 int btn = 2;
 int draw_state = 0;
 //const int temperaturePin = A0;
@@ -27,6 +29,7 @@ int f7 = 25;
 int f8 = 38;
 int f9 = 36;
 int f10 = 34;
+int f11 = 24;
 /*/////////////////////////////////////////////////////////////////////*/
 /*///////////////////////////////RGB tyl//////////////////////////////////////*/
 #include <Adafruit_NeoPixel.h>
@@ -59,14 +62,16 @@ int average = 0;                // the average
 int inputPin = A0;
 /*/////////////////////////////////////////////////////////////////////*/
 //U8GLIB_SH1106_128X64 u8g(26, 24, 28, 30);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
-U8GLIB_SH1106_128X64 u8g(30, 26, 24, 28);  // SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
+//U8GLIB_SH1106_128X64 u8g(30, 26, 24, 28);  // SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
 
+U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
 
 
 void desk1(void) {
+  
   DateTime now = RTC.now();
   u8g.setFont(u8g_font_fub30r);
-  u8g.setPrintPos(0, 40);
+  u8g.setPrintPos(0, 35);
   u8g.print(now.hour(), DEC);
 
   u8g.print(":");
@@ -88,31 +93,39 @@ void desk1(void) {
   }
 
   int odczytEnd = tempAv();
-  u8g.setFont(u8g_font_04b_03br);
-  u8g.setPrintPos(0, 62);
+  u8g.setFont(u8g_font_10x20);
+  u8g.setPrintPos(0, 60);
   u8g.print("@ ");
   u8g.print(odczytEnd);
 
-  u8g.setPrintPos(50, 62);
+  u8g.setPrintPos(50, 60);
   u8g.print(now.day(), DEC);
   u8g.print("/");
   u8g.print(now.month(), DEC);
   u8g.print("/");
   u8g.print(now.year(), DEC);
+  
 }
 
 void desk2(void) {
-  int odczytEnd = tempAv();
-  u8g.setFont(u8g_font_fub30r);
-  u8g.setPrintPos(0, 42);
-  u8g.print("@ ");
-  u8g.print(odczytEnd);
+  
+  u8g.setFont(u8g_font_fub20r);
+  u8g.setPrintPos(0, 32);
+  u8g.print("Kajenia");
+  u8g.setFont(u8g_font_unifont);
+  u8g.setPrintPos(0, 60);
+  u8g.print("Jest super!");
 
-  u8g.setContrast(0);
-  u8g.setFont(u8g_font_04b_03br);
-  u8g.setPrintPos(0, 62);
-  u8g.print("TAK BARDZO BARDZO KOCHAM CIĘ!");
 }
+//void desk2(void) {
+//  int odczytEnd = tempAv();
+//  u8g.setFont(u8g_font_fub30r);
+//  u8g.setPrintPos(0, 32);
+//  u8g.print("@ ");
+//  u8g.print(odczytEnd);
+//
+//
+//}
 
 float tempAv() {
   // subtract the last reading:
@@ -138,15 +151,15 @@ float tempAv() {
 }
 
 void desk3(void) {
-  u8g.setFont(u8g_font_unifont);
-  u8g.setPrintPos(0, 20);
-  u8g.print("ELOx SIEMA CO TAM?");
+  u8g.setFont(u8g_font_fub30r);
+  u8g.setPrintPos(0, 40);
+  u8g.print(rpm);
 }
 
 void we(void) {
   u8g.setFont(u8g_font_unifont);
   u8g.setPrintPos(0, 20);
-  u8g.print("Welcome");
+  u8g.print(rpm);
 }
 
 void draw(void) {
@@ -211,7 +224,9 @@ void setAllLed(int R, int G, int B) {
   pixels.setPixelColor(48, R, G, B);
   pixels.setPixelColor(49, R, G, B);
   pixels.setPixelColor(50, R, G, B);
+  
   pixels.show();
+  
 }
 
 
@@ -314,7 +329,7 @@ void policeAc(int t) {
 
 
 void setup(void) {
-
+    pinMode(f11, OUTPUT);
   /*//////////////////////////////RPM///////////////////////////////////////*/
   pinMode(pinRPM, INPUT_PULLUP);
   /*////////////////////////////////RGB tyl/////////////////////////////////////*/
@@ -358,6 +373,7 @@ void setup(void) {
 
 void loop(void) {
   as++;
+  digitalWrite(f11, LOW);
 
 
   /*
@@ -367,7 +383,7 @@ void loop(void) {
     rpm = 60000000 / duration / 4;
 
     Serial.println(rpm);
-  */
+  
 
 
   /*/////////////////////////////////////////////////////////////////////*/
@@ -392,10 +408,10 @@ void loop(void) {
     setAllLed(0, 0, 0);
   }
 
-  /*/////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
 
   // picture loop
-  /*u8g.firstPage();
+  u8g.firstPage();
   do {
     draw();
   } while ( u8g.nextPage() );
@@ -403,7 +419,7 @@ void loop(void) {
 
   if (digitalRead(btn) == LOW) {
     draw_state++;
-    //delay(30);
+    delay(30);
     if ( draw_state >= 3 ) {
       draw_state = 0;
     }

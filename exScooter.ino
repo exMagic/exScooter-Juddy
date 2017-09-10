@@ -1,37 +1,18 @@
 #include <Wire.h>
 #include "RTClib.h"
 RTC_DS1307 RTC;
-//test
-int as = 0; //jak szybko wykonuje sie pętla
-int initial = 0;
-int final = 0;
-
+/*/////////////////////////////////--Display--////////////////////////////////////*/
 #include "U8glib.h"
-// SW SPI Com: SCK/CLK/D0 = 13, MOSI/DIN/D1 = 11, CS/CS = 10, A0/D/C/DC = 9
-
-int btn = 2;
+U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST); // Dev 0, Fast I2C / TWI
+int btn = 2; // btn display
 int draw_state = 0;
-//const int temperaturePin = A0;
-
-/*/////////////////////////////////RPM////////////////////////////////////*/
+int f11 = 24; // GND for display
+/*/////////////////////////////////--RPM--////////////////////////////////////*/
 int pinRPM = A2;
 long rpm = 0;
 double timerrevCalc = 0;
 double duration;
-/*///////////////////////////////FUEL//////////////////////////////////////*/
-int f1 = 37;
-int f2 = 35;
-int f3 = 33;
-int f4 = 31;
-int f5 = 29;
-int f6 = 27;
-int f7 = 25;
-int f8 = 38;
-int f9 = 36;
-int f10 = 34;
-int f11 = 24;
-/*/////////////////////////////////////////////////////////////////////*/
-/*///////////////////////////////RGB tyl//////////////////////////////////////*/
+/*///////////////////////////////--RGB--//////////////////////////////////////*/
 #include <Adafruit_NeoPixel.h>
 #define PIN 12
 int NUMPIXELS = 50;
@@ -49,11 +30,10 @@ int it  = 1;
 int pv = 50;
 int pi  = 200;
 int pausePolice = 30;
-
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 /*/////////////////////////////////////////////////////////////////////*/
 
-/*/////////////////////////////////smoth////////////////////////////////////*/
+/*/////////////////////////////////--smoth--////////////////////////////////////*/
 const int numReadings = 10;
 int readings[numReadings];      // the readings from the analog input
 int readIndex = 0;              // the index of the current reading
@@ -61,19 +41,17 @@ int total = 0;                  // the running total
 int average = 0;                // the average
 int inputPin = A0;
 /*/////////////////////////////////////////////////////////////////////*/
-//U8GLIB_SH1106_128X64 u8g(26, 24, 28, 30);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
-//U8GLIB_SH1106_128X64 u8g(30, 26, 24, 28);  // SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
-
-U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
+unsigned long time;
+int prevTime;
+int loopTime;
 
 
 void desk1(void) {
-  
   DateTime now = RTC.now();
+  /*///////////////////////////////--Dispaly Time--//////////////////////////////////////*/
   u8g.setFont(u8g_font_fub30r);
   u8g.setPrintPos(0, 35);
   u8g.print(now.hour(), DEC);
-
   u8g.print(":");
   if ((now.minute()) <= 9) {
     u8g.print("0");
@@ -82,51 +60,28 @@ void desk1(void) {
   else {
     u8g.print(now.minute(), DEC);
   }
-  u8g.setFont(u8g_font_fub11n);
-  u8g.print(":");
-  if ((now.second()) <= 9) {
-    u8g.print("0");
-    u8g.print(now.second(), DEC);
-  }
-  else {
-    u8g.print(now.second(), DEC);
-  }
-
+  
+  /*///////////////////////////////--Dispaly TEMP and Date--//////////////////////////////////////*/
   int odczytEnd = tempAv();
-  u8g.setFont(u8g_font_10x20);
+  u8g.setFont(u8g_font_7x13B);
   u8g.setPrintPos(0, 60);
-  u8g.print("@ ");
+  u8g.print("@");
   u8g.print(odczytEnd);
-
   u8g.setPrintPos(50, 60);
   u8g.print(now.day(), DEC);
   u8g.print("/");
   u8g.print(now.month(), DEC);
   u8g.print("/");
   u8g.print(now.year(), DEC);
-  
 }
-
 void desk2(void) {
-  
-  u8g.setFont(u8g_font_fub20r);
+  u8g.setFont(u8g_font_fur14);
   u8g.setPrintPos(0, 32);
-  u8g.print("Kajenia");
-  u8g.setFont(u8g_font_unifont);
+  u8g.print("Siema Kamil");
+  u8g.setFont(u8g_font_fur14);
   u8g.setPrintPos(0, 60);
-  u8g.print("Jest super!");
-
+  u8g.print("i Magda ;)");
 }
-//void desk2(void) {
-//  int odczytEnd = tempAv();
-//  u8g.setFont(u8g_font_fub30r);
-//  u8g.setPrintPos(0, 32);
-//  u8g.print("@ ");
-//  u8g.print(odczytEnd);
-//
-//
-//}
-
 float tempAv() {
   // subtract the last reading:
   total = total - readings[readIndex];
@@ -154,14 +109,13 @@ void desk3(void) {
   u8g.setFont(u8g_font_fub30r);
   u8g.setPrintPos(0, 40);
   u8g.print(rpm);
-}
 
+}
 void we(void) {
   u8g.setFont(u8g_font_unifont);
   u8g.setPrintPos(0, 20);
   u8g.print(rpm);
 }
-
 void draw(void) {
   switch (draw_state >> 0) {
     case 0: desk1(); break;
@@ -169,8 +123,6 @@ void draw(void) {
     case 2: desk3(); break;
   }
 }
-
-
 /*/////////////////////////////////////////////////////////////////////*/
 void setAllLed(int R, int G, int B) {
   pixels.setPixelColor(0, R, G, B);
@@ -224,37 +176,26 @@ void setAllLed(int R, int G, int B) {
   pixels.setPixelColor(48, R, G, B);
   pixels.setPixelColor(49, R, G, B);
   pixels.setPixelColor(50, R, G, B);
-  
   pixels.show();
-  
 }
-
-
-
 void leftAc() {
   for (int i = 25; i <= NUMPIXELS; i++) {
-
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
     pixels.show();
   }
   delay(50);
-
   for (int i = 25; i <= NUMPIXELS; i++) {
-
     pixels.setPixelColor(i, pixels.Color(255, 40, 0));
     pixels.show();
     delay(it);
   }
-
 }
 void rightAc() {
   for (int i = 25; i >= 0; i--) {
-
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
     pixels.show();
   }
   delay(100);
-
   for (int i = 25; i >= 0; i--) {
 
     pixels.setPixelColor(i, pixels.Color(255, 40, 0));
@@ -329,7 +270,7 @@ void policeAc(int t) {
 
 
 void setup(void) {
-    pinMode(f11, OUTPUT);
+  pinMode(f11, OUTPUT);
   /*//////////////////////////////RPM///////////////////////////////////////*/
   pinMode(pinRPM, INPUT_PULLUP);
   /*////////////////////////////////RGB tyl/////////////////////////////////////*/
@@ -354,39 +295,28 @@ void setup(void) {
   Serial.begin(9600);
   Wire.begin();
   RTC.begin();
-
   if (! RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
     // following line sets the RTC to the date & time this sketch was compiled
-
     RTC.adjust(DateTime(__DATE__, __TIME__));
   }
-  /*
-    // picture loop
-    u8g.firstPage();
-    do {
-    we();
-
-    } while ( u8g.nextPage() );
-  */
 }
 
 void loop(void) {
-  as++;
-  digitalWrite(f11, LOW);
-
-
-  /*
-    duration = pulseIn(pinRPM, HIGH, 10000000);
-    timerrevCalc = duration * 60;
-
-    rpm = 60000000 / duration / 4;
-
-    Serial.println(rpm);
+  Serial.print("Time: ");
+  time = millis();
+  //prints time since program started 
+  loopTime = time - prevTime;
+  Serial.println(loopTime);
+  prevTime = time;
+ 
+  digitalWrite(f11, LOW); // GND for display
   
-
-
-  /*/////////////////////////////////////////////////////////////////////*/
+      duration = pulseIn(pinRPM, HIGH, 30000);
+      timerrevCalc = duration * 60;
+      rpm = 60000000 / duration / 4 / 2;
+  
+  /*///////////////////////////////--check state of indicators--//////////////////////////////////////*/
   if (digitalRead (policeBtn) == LOW) {
     policeAc(5);
   }
@@ -407,28 +337,17 @@ void loop(void) {
   else {
     setAllLed(0, 0, 0);
   }
-
-  /////////////////////////////////////////////////////////////////////
-
-  // picture loop
+  /*/////////////////////////////////--picture loop--////////////////////////////////////////////*/
   u8g.firstPage();
   do {
     draw();
   } while ( u8g.nextPage() );
-
-
   if (digitalRead(btn) == LOW) {
     draw_state++;
-    delay(30);
+    delay(300);
     if ( draw_state >= 3 ) {
       draw_state = 0;
     }
-
   }
-  // rebuild the picture after some delay*/
-
-  Serial.println(as);
-
-  
 }
 

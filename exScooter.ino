@@ -9,7 +9,8 @@ int draw_state = 0;
 int f11 = 24; // GND for display
 /*/////////////////////////////////--RPM--////////////////////////////////////*/
 int pinRPM = A2;
-long rpm = 0;
+float rpm = 0;
+double rpm2;
 double timerrevCalc = 0;
 double duration;
 /*///////////////////////////////--RGB--//////////////////////////////////////*/
@@ -17,8 +18,8 @@ double duration;
 #define PIN 12
 int NUMPIXELS = 50;
 int stopBtn = 11;
-int leftBtn = 10;
-int rightBtn = 9;
+int leftBtn = 9;
+int rightBtn = 10;
 int policeBtn = 8;
 int D1 = 0;
 double D2 = 0.5;
@@ -60,6 +61,9 @@ void desk1(void) {
   else {
     u8g.print(now.minute(), DEC);
   }
+  u8g.setFont(u8g_font_7x13B);
+  u8g.setPrintPos(87, 30);
+  u8g.print(rpm2);
   
   /*///////////////////////////////--Dispaly TEMP and Date--//////////////////////////////////////*/
   int odczytEnd = tempAv();
@@ -77,10 +81,10 @@ void desk1(void) {
 void desk2(void) {
   u8g.setFont(u8g_font_fur14);
   u8g.setPrintPos(0, 32);
-  u8g.print("Siema Kamil");
+  u8g.print("exScooter");
   u8g.setFont(u8g_font_fur14);
   u8g.setPrintPos(0, 60);
-  u8g.print("i Magda ;)");
+  u8g.print("______------");
 }
 float tempAv() {
   // subtract the last reading:
@@ -114,7 +118,7 @@ void desk3(void) {
 void we(void) {
   u8g.setFont(u8g_font_unifont);
   u8g.setPrintPos(0, 20);
-  u8g.print(rpm);
+  u8g.print(rpm2);
 }
 void draw(void) {
   switch (draw_state >> 0) {
@@ -178,47 +182,70 @@ void setAllLed(int R, int G, int B) {
   pixels.setPixelColor(50, R, G, B);
   pixels.show();
 }
+void setRightLed(int R, int G, int B) {
+  pixels.setPixelColor(25, R, G, B);
+  pixels.setPixelColor(26, R, G, B);
+  pixels.setPixelColor(27, R, G, B);
+  pixels.setPixelColor(28, R, G, B);
+  pixels.setPixelColor(29, R, G, B);
+  pixels.setPixelColor(30, R, G, B);
+  pixels.setPixelColor(31, R, G, B);
+  pixels.setPixelColor(32, R, G, B);
+  pixels.setPixelColor(33, R, G, B);
+  pixels.setPixelColor(34, R, G, B);
+  pixels.setPixelColor(35, R, G, B);
+  pixels.setPixelColor(36, R, G, B);
+  pixels.setPixelColor(37, R, G, B);
+  pixels.setPixelColor(38, R, G, B);
+  pixels.setPixelColor(39, R, G, B);
+  pixels.setPixelColor(40, R, G, B);
+  pixels.setPixelColor(41, R, G, B);
+  pixels.setPixelColor(42, R, G, B);
+  pixels.setPixelColor(43, R, G, B);
+  pixels.setPixelColor(44, R, G, B);
+  pixels.setPixelColor(45, R, G, B);
+  pixels.setPixelColor(46, R, G, B);
+  pixels.setPixelColor(47, R, G, B);
+  pixels.setPixelColor(48, R, G, B);
+  pixels.setPixelColor(49, R, G, B);
+  pixels.setPixelColor(50, R, G, B);
+  pixels.show();
+}
+void setLeftLed(int R, int G, int B) {
+  pixels.setPixelColor(0, R, G, B);
+  pixels.setPixelColor(1, R, G, B);
+  pixels.setPixelColor(2, R, G, B);
+  pixels.setPixelColor(3, R, G, B);
+  pixels.setPixelColor(4, R, G, B);
+  pixels.setPixelColor(5, R, G, B);
+  pixels.setPixelColor(6, R, G, B);
+  pixels.setPixelColor(7, R, G, B);
+  pixels.setPixelColor(8, R, G, B);
+  pixels.setPixelColor(9, R, G, B);
+  pixels.setPixelColor(10, R, G, B);
+  pixels.setPixelColor(11, R, G, B);
+  pixels.setPixelColor(12, R, G, B);
+  pixels.setPixelColor(13, R, G, B);
+  pixels.setPixelColor(14, R, G, B);
+  pixels.setPixelColor(15, R, G, B);
+  pixels.setPixelColor(16, R, G, B);
+  pixels.setPixelColor(17, R, G, B);
+  pixels.setPixelColor(18, R, G, B);
+  pixels.setPixelColor(19, R, G, B);
+  pixels.setPixelColor(20, R, G, B);
+  pixels.setPixelColor(21, R, G, B);
+  pixels.setPixelColor(22, R, G, B);
+  pixels.setPixelColor(23, R, G, B);
+  pixels.setPixelColor(24, R, G, B);
+
+  pixels.show();
+}
 void leftAc() {
-  for (int i = 25; i <= NUMPIXELS; i++) {
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-    pixels.show();
-  }
-  delay(50);
-  for (int i = 25; i <= NUMPIXELS; i++) {
-    pixels.setPixelColor(i, pixels.Color(255, 40, 0));
-    pixels.show();
-    delay(it);
-  }
+  setLeftLed(255, 40, 0);
 }
 void rightAc() {
-  for (int i = 25; i >= 0; i--) {
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-    pixels.show();
-  }
-  delay(100);
-  for (int i = 25; i >= 0; i--) {
-
-    pixels.setPixelColor(i, pixels.Color(255, 40, 0));
-    pixels.show();
-    delay(it);
-  }
-  delay(200);
-  for (int i = 25; i >= 0; i--) {
-
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-    pixels.show();
-    delay(it);
-  }
-  delay(100);
-
-  for (int i = 25; i >= 0; i--) {
-
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-    pixels.show();
-  }
-  delay(0);
+   setRightLed(255, 40, 0);
 }
-
 void blueBlink() {
   for (int i = NUMPIXELS; i >= 0; i--) {
     pixels.setPixelColor(i, pixels.Color(0, 0, 255));
@@ -313,9 +340,17 @@ void loop(void) {
   digitalWrite(f11, LOW); // GND for display
   
       duration = pulseIn(pinRPM, HIGH, 30000);
-      timerrevCalc = duration * 60;
-      rpm = 60000000 / duration / 4 / 2;
+      if (duration <= 0 ){
+        rpm2 = 0.0;
+      }
+      else{
+        timerrevCalc = duration * 60;
+      rpm = 60000000 / timerrevCalc /100;
+        rpm2 = rpm;
+      }
   
+      
+      
   /*///////////////////////////////--check state of indicators--//////////////////////////////////////*/
   if (digitalRead (policeBtn) == LOW) {
     policeAc(5);
@@ -328,7 +363,7 @@ void loop(void) {
   }
   else if (digitalRead (stopBtn) == LOW) {
     setAllLed(255, 0, 0);
-    delay(1);
+   // delay(1);
   }
   else if (digitalRead (stopBtn) == HIGH) {
     setAllLed(30, 0, 0);

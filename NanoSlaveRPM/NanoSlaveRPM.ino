@@ -28,7 +28,7 @@ void loop()
   else {
     timerrevCalc = duration * 60;
     rpm = 60000000 / timerrevCalc / 100;
-    rpm2 = rpm*100;
+    rpm2 = rpm*100;//remove *100 for real engine
   }
 
 }

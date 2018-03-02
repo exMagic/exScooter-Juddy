@@ -4,7 +4,7 @@ RTC_DS1307 RTC;
 
 int bigNum;
 byte a, b;
-
+int rmp3;
 /*/////////////////////////////////--Display--////////////////////////////////////*/
 #include <U8glib.h>
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST); // Dev 0, Fast I2C / TWI
@@ -67,7 +67,7 @@ void desk1(void) {
   }
   u8g.setFont(u8g_font_7x13B);
   u8g.setPrintPos(87, 30);
-  u8g.print(rpm2);
+  u8g.print(rmp3);
 
   /*///////////////////////////////--Dispaly TEMP and Date--//////////////////////////////////////*/
   int odczytEnd = tempAv();
@@ -369,7 +369,7 @@ void loop(void) {
 
   bigNum = a;
   bigNum = (bigNum << 8) | b;
-
+  rmp3 = bigNum;
 
   Serial.print(bigNum);
   Serial.print("             ");

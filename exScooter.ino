@@ -346,10 +346,10 @@ void setup(void) {
 
 
   RTC.begin();
+  RTC.adjust(DateTime(__DATE__, __TIME__));
   if (! RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
     // following line sets the RTC to the date & time this sketch was compiled
-    RTC.adjust(DateTime(__DATE__, __TIME__));
   }
 }
 
@@ -380,8 +380,16 @@ void loop(void) {
   time = millis();
   //prints time since program started
   loopTime = time - prevTime;
-  Serial.println(loopTime);
+  Serial.print(loopTime);
   prevTime = time;
+
+
+ 
+  DateTime now = RTC.now();
+  Serial.print("             ");
+  Serial.print(now.hour(), DEC);
+  Serial.print(":");
+  Serial.println(now.minute(), DEC);
 
   digitalWrite(f11, LOW); // GND for display
 

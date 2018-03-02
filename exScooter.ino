@@ -1,6 +1,10 @@
 #include <Wire.h>
 #include <RTClib.h>
 RTC_DS1307 RTC;
+
+int bigNum;
+byte a, b;
+
 /*/////////////////////////////////--Display--////////////////////////////////////*/
 #include <U8glib.h>
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST); // Dev 0, Fast I2C / TWI
@@ -50,7 +54,7 @@ int loopTime;
 void desk1(void) {
   DateTime now = RTC.now();
   /*///////////////////////////////--Dispaly Time--//////////////////////////////////////*/
-  u8g.setFont(u8g_font_fub30r);
+  u8g.setFont(u8g_font_fur14);
   u8g.setPrintPos(0, 35);
   u8g.print(now.hour(), DEC);
   u8g.print(":");
@@ -64,7 +68,7 @@ void desk1(void) {
   u8g.setFont(u8g_font_7x13B);
   u8g.setPrintPos(87, 30);
   u8g.print(rpm2);
-  
+
   /*///////////////////////////////--Dispaly TEMP and Date--//////////////////////////////////////*/
   int odczytEnd = tempAv();
   u8g.setFont(u8g_font_7x13B);
@@ -244,7 +248,7 @@ void leftAc() {
   setLeftLed(255, 40, 0);
 }
 void rightAc() {
-   setRightLed(255, 40, 0);
+  setRightLed(255, 40, 0);
 }
 void blueBlink() {
   for (int i = NUMPIXELS; i >= 0; i--) {
@@ -321,6 +325,26 @@ void setup(void) {
   // u8g.setRot180();
   Serial.begin(9600);
   Wire.begin();
+
+
+
+  int16_t bigNum;
+
+  byte a, b;
+  Wire.requestFrom(54, 2);
+
+  a = Wire.read();
+  b = Wire.read();
+
+  bigNum = a;
+  bigNum = (bigNum << 8) | b;
+
+  Serial.print(a);
+  Serial.print("\n");
+
+
+
+
   RTC.begin();
   if (! RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -330,27 +354,49 @@ void setup(void) {
 }
 
 void loop(void) {
+  //delay(2000);
+
+  int32_t bigNum;
+
+  byte a, b, c, d;
+
+  Wire.requestFrom(54, 4);
+
+  a = Wire.read();
+  b = Wire.read();
+  c = Wire.read();
+  d = Wire.read();
+
+  bigNum = a;
+  bigNum = (bigNum << 8) | b;
+
+
+  Serial.print(bigNum);
+  Serial.print("             ");
+
+
+
   Serial.print("Time: ");
   time = millis();
-  //prints time since program started 
+  //prints time since program started
   loopTime = time - prevTime;
   Serial.println(loopTime);
   prevTime = time;
- 
+
   digitalWrite(f11, LOW); // GND for display
-  
-      duration = pulseIn(pinRPM, HIGH, 30000);
-      if (duration <= 0 ){
-        rpm2 = 0.0;
-      }
-      else{
-        timerrevCalc = duration * 60;
-      rpm = 60000000 / timerrevCalc /100;
-        rpm2 = rpm;
-      }
-  
-      
-      
+
+  duration = pulseIn(pinRPM, HIGH, 30000);
+  if (duration <= 0 ) {
+    rpm2 = 0.0;
+  }
+  else {
+    timerrevCalc = duration * 60;
+    rpm = 60000000 / timerrevCalc / 100;
+    rpm2 = rpm;
+  }
+
+
+
   /*///////////////////////////////--check state of indicators--//////////////////////////////////////*/
   if (digitalRead (policeBtn) == LOW) {
     policeAc(5);
@@ -363,7 +409,7 @@ void loop(void) {
   }
   else if (digitalRead (stopBtn) == LOW) {
     setAllLed(255, 0, 0);
-   // delay(1);
+    // delay(1);
   }
   else if (digitalRead (stopBtn) == HIGH) {
     setAllLed(30, 0, 0);

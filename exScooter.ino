@@ -327,19 +327,25 @@ void setup(void) {
   Wire.begin();
 
 
-
+  ///////////////////////////////////RPM
   int16_t bigNum;
-
   byte a, b;
   Wire.requestFrom(54, 2);
-
   a = Wire.read();
   b = Wire.read();
-
   bigNum = a;
   bigNum = (bigNum << 8) | b;
-
   Serial.print(a);
+  Serial.print("\n");
+  /////////////////////////////////////SPEED
+  int16_t bigNum2;
+  byte a2, b2;
+  Wire.requestFrom(55, 2);
+  a2 = Wire.read();
+  b2 = Wire.read();
+  bigNum2 = a2;
+  bigNum2 = (bigNum2 << 8) | b2;
+  Serial.print(a2);
   Serial.print("\n");
 
 
@@ -355,25 +361,34 @@ void setup(void) {
 
 void loop(void) {
   //delay(2000);
-
+  ////////////////////////////////////RPM
   int32_t bigNum;
-
   byte a, b, c, d;
-
   Wire.requestFrom(54, 4);
-
   a = Wire.read();
   b = Wire.read();
   c = Wire.read();
   d = Wire.read();
-
   bigNum = a;
   bigNum = (bigNum << 8) | b;
   rmp3 = bigNum;
-
+  Serial.print("  RPM:");
   Serial.print(bigNum);
-  Serial.print("             ");
 
+  ////////////////////////////////////SPEED
+  int32_t bigNum2;
+  byte a2, b2, c2, d2;
+  Wire.requestFrom(55, 4);
+  a2 = Wire.read();
+  b2 = Wire.read();
+  c2 = Wire.read();
+  d2 = Wire.read();
+  bigNum2 = a2;
+  bigNum2 = (bigNum2 << 8) | b2;
+  //rmp32 = bigNum2;
+  Serial.print("    SPEED:");
+  Serial.print(bigNum2);
+  Serial.print("             ");
 
 
   Serial.print("Time: ");
@@ -384,7 +399,7 @@ void loop(void) {
   prevTime = time;
 
 
- 
+
   DateTime now = RTC.now();
   Serial.print("             ");
   Serial.print(now.hour(), DEC);
@@ -439,4 +454,3 @@ void loop(void) {
     }
   }
 }
-

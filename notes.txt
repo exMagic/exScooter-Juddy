@@ -1,0 +1,12 @@
+Scanning...
+I2C device found at address 0x36  ! Arduino RPM
+I2C device found at address 0x37  ! Arduino SPEED
+I2C device found at address 0x3C  ! OLED
+I2C device found at address 0x50  ! rct time
+I2C device found at address 0x68  ! rct time
+I2C device found at address 0x69  ! Gyro
+done
+
+
+log columns:
+rpm, speed, tmp,  loop time, time

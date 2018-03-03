@@ -372,7 +372,6 @@ void loop(void) {
   bigNum = a;
   bigNum = (bigNum << 8) | b;
   rmp3 = bigNum;
-  Serial.print("  RPM:");
   Serial.print(bigNum);
 
   ////////////////////////////////////SPEED
@@ -386,27 +385,42 @@ void loop(void) {
   bigNum2 = a2;
   bigNum2 = (bigNum2 << 8) | b2;
   //rmp32 = bigNum2;
-  Serial.print("    SPEED:");
+  Serial.print("\t");
   Serial.print(bigNum2);
-  Serial.print("             ");
 
+  ////////////////////////////////////TMP
+  int temp5 = tempAv();
+  Serial.print("\t");
+  Serial.print(temp5);
 
-  Serial.print("Time: ");
+  ////////////////////////////////////LOOP TIME
   time = millis();
   //prints time since program started
   loopTime = time - prevTime;
+  Serial.print("\t");
   Serial.print(loopTime);
   prevTime = time;
 
 
-
+  ////////////////////////////////////TIME
+  Serial.print("\t");
   DateTime now = RTC.now();
-  Serial.print("             ");
   Serial.print(now.hour(), DEC);
   Serial.print(":");
-  Serial.println(now.minute(), DEC);
+  Serial.print(now.minute(), DEC);
+  Serial.print(":");
+  Serial.print(now.second(), DEC);
+  Serial.print("  ");
+  Serial.print(now.day(), DEC);
+  Serial.print('/');
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  Serial.println(now.year(), DEC);
 
-  digitalWrite(f11, LOW); // GND for display
+
+
+
+
 
   duration = pulseIn(pinRPM, HIGH, 30000);
   if (duration <= 0 ) {

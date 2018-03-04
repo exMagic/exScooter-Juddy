@@ -1,7 +1,3 @@
-#include <Wire.h>
-#include <RTClib.h>
-RTC_DS1307 RTC;
-////////////////////////////////GYRO////////////////////////////////////////////
 // I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
 // 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
 // Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
@@ -110,7 +106,7 @@ MPU6050 mpu(0x69); // <-- use for AD0 high
 // components with gravity removed and adjusted for the world frame of
 // reference (yaw is relative to initial orientation, since no magnetometer
 // is present in this case). Could be quite handy in some cases.
-#define OUTPUT_READABLE_WORLDACCEL
+//#define OUTPUT_READABLE_WORLDACCEL
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
@@ -118,7 +114,7 @@ MPU6050 mpu(0x69); // <-- use for AD0 high
 
 
 
-#define INTERRUPT_PIN 3  // use pin 2 on Arduino Uno & most boards
+#define INTERRUPT_PIN 3  // use pin 3 on Arduino Uno & most boards
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 bool blinkState = false;
 
@@ -152,10 +148,14 @@ volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin h
 void dmpDataReady() {
   mpuInterrupt = true;
 }
-////////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 
 
-////////////////////////////////////////////
+
+#include <Wire.h>
+#include <RTClib.h>
+RTC_DS1307 RTC;
+
 int bigNum;
 byte a, b;
 int rmp3;
@@ -453,20 +453,8 @@ void policeAc(int t) {
 }
 /*/////////////////////////////////////////////////////////////////////*/
 
-//#####################################################################################################################################
-//#####################################################################################################################################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                          SETUP                                                             ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#####################################################################################################################################
-//#####################################################################################################################################
 
 void setup(void) {
-  //////////////////////////////////////////GYRO/////////////////////////////////////////////////////////
   // join I2C bus (I2Cdev library doesn't do this automatically)
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin();
@@ -507,10 +495,10 @@ void setup(void) {
   devStatus = mpu.dmpInitialize();
 
   // supply your own gyro offsets here, scaled for min sensitivity
-  mpu.setXGyroOffset(78);
-  mpu.setYGyroOffset(-50);
-  mpu.setZGyroOffset(81);
-  mpu.setZAccelOffset(1600); // 1688 factory default for my test chip
+  mpu.setXGyroOffset(220);
+  mpu.setYGyroOffset(76);
+  mpu.setZGyroOffset(-85);
+  mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
   // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
@@ -541,18 +529,20 @@ void setup(void) {
 
   // configure LED for output
   pinMode(LED_PIN, OUTPUT);
- /////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////
+
+
+
+  //============================================================================================================================================================
   pinMode(f11, OUTPUT);
   /*//////////////////////////////RPM///////////////////////////////////////*/
   pinMode(pinRPM, INPUT_PULLUP);
   /*////////////////////////////////RGB tyl/////////////////////////////////////*/
-//  pinMode(stopBtn, INPUT_PULLUP);
-//  pinMode(leftBtn, INPUT_PULLUP);
-//  pinMode(rightBtn, INPUT_PULLUP);
-//  pinMode(policeBtn, INPUT_PULLUP);
-//  pinMode(A1, INPUT_PULLUP);
-//  pixels.begin();
+  pinMode(stopBtn, INPUT_PULLUP);
+  pinMode(leftBtn, INPUT_PULLUP);
+  pinMode(rightBtn, INPUT_PULLUP);
+  pinMode(policeBtn, INPUT_PULLUP);
+  pinMode(A1, INPUT_PULLUP);
+  pixels.begin();
   /*//////////////////////////////smoth///////////////////////////////////////*/
   // initialize all the readings to 0:
   for (int thisReading = 0; thisReading < numReadings; thisReading++) {
@@ -566,7 +556,7 @@ void setup(void) {
   // flip screen, if required
   // u8g.setRot180();
   //Serial.begin(9600);
-  Wire.begin();
+  //Wire.begin();
 
 
   ///////////////////////////////////RPM
@@ -594,31 +584,18 @@ void setup(void) {
 
 
   RTC.begin();
-  RTC.adjust(DateTime(__DATE__, __TIME__));
+  //RTC.adjust(DateTime(__DATE__, __TIME__));
   if (! RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
     // following line sets the RTC to the date & time this sketch was compiled
   }
 }
 
-//#####################################################################################################################################
-//#####################################################################################################################################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                          LOOP                                                              ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#################                                                                                            ########################
-//#####################################################################################################################################
-//#####################################################################################################################################
-
 void loop(void) {
-  /////////////////////////////////////////////////////////////////GYRO
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
 
-  //   wait for MPU interrupt or extra packet(s) available
+  // wait for MPU interrupt or extra packet(s) available
   while (!mpuInterrupt && fifoCount < packetSize) {
     // other program behavior stuff here
     // .
@@ -687,28 +664,27 @@ void loop(void) {
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-    //Serial.print(",00");
-    //Serial.print(ypr[0] * 180 / M_PI);
-    //Serial.print(",");
+    Serial.print("ypr\t");
+    Serial.print(ypr[0] * 180 / M_PI);
+    Serial.print("\t");
     Serial.print(ypr[1] * 180 / M_PI);
     Serial.print("\t");
-    Serial.print(ypr[2] * 180 / M_PI);
-    
+    Serial.println(ypr[2] * 180 / M_PI);
 #endif
 
-//#ifdef OUTPUT_READABLE_REALACCEL
-//    // display real acceleration, adjusted to remove gravity
-//    mpu.dmpGetQuaternion(&q, fifoBuffer);
-//    mpu.dmpGetAccel(&aa, fifoBuffer);
-//    mpu.dmpGetGravity(&gravity, &q);
-//    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-//    Serial.print(",");
-//    Serial.print(aaReal.x);
-//    Serial.print(",");
-//    Serial.print(aaReal.y);
-//    Serial.print(",");
-//    Serial.println(aaReal.z);
-//#endif
+#ifdef OUTPUT_READABLE_REALACCEL
+    // display real acceleration, adjusted to remove gravity
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+    Serial.print("areal\t");
+    Serial.print(aaReal.x);
+    Serial.print("\t");
+    Serial.print(aaReal.y);
+    Serial.print("\t");
+    Serial.println(aaReal.z);
+#endif
 
 #ifdef OUTPUT_READABLE_WORLDACCEL
     // display initial world-frame acceleration, adjusted to remove gravity
@@ -718,7 +694,7 @@ void loop(void) {
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
     mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-    Serial.print("\t");
+    Serial.print("aworld\t");
     Serial.print(aaWorld.x);
     Serial.print("\t");
     Serial.print(aaWorld.y);
@@ -744,8 +720,7 @@ void loop(void) {
     blinkState = !blinkState;
     digitalWrite(LED_PIN, blinkState);
   }
-  /////////////////////////////////////////////////////////////////
-  
+  //===============================================================================================================================================
   //delay(2000);
   ////////////////////////////////////RPM
   int32_t bigNum;

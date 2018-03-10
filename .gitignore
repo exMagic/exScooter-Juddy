@@ -201,6 +201,7 @@ FakesAssemblies/
 
 # Visual Micro files
 __vm/
+__vm
 *.sln
 *.vcxproj
 *.filters

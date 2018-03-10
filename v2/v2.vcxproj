@@ -78,6 +78,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include=".gitignore" />
     <None Include="v2.ino">
       <FileType>CppCode</FileType>
     </None>
